@@ -14,21 +14,46 @@ const FILES_TO_CACHE = [
     "./icons/icon-512x512.png"
 ];
 
-self.addEventListener('install', function(e) {
+const CACHE_NAME = "pwa-budget-cache";
+const DATA_CACHE_NAME = "data-budget-cache";
+
+self.addEventListener('install', function(e){
+    e.waitUntil (
+        caches.open(CACHE_NAME).then(cache => {
+            console.log("Pre-cache successful!");
+            return cache.addAll(FILES_TO_CACHE);
+        })
+    );
+    self.skipWaiting
+});
+
+self.addEventListener('activate', function(e) {
     e.waitUntil(
         caches.keys().then(keyList => {
             return Promise.all(
-                keyList.map( key => {
-                    if (key !== CACHE_NAME && key !== DATA_CACHCE_NAME) {
-                        return caches.delete(key)
+                keyList.map(key => {
+                    if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+                        console.log('Removing old cache data', key);
+                        return caches.delete(key);
                     }
                 })
             )
         })
     )
     self.clients.claim();
-})
+});
 
 self.addEventListener('fetch', function(e){
-    e.respondWith();
+    console.log("fetching at :" + e.request.url);
+    e.respondWith(
+        fetch(e.request).catch(function () {
+            return caches.match(e.request).then(function (response) {
+                if (response) {
+                    return response
+                } else if (e.request.headers.get("accept").includes("text/html")){
+                    return caches.match("/")
+                }
+            })
+        })
+    )
 })
