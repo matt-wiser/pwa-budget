@@ -14,8 +14,8 @@ const FILES_TO_CACHE = [
     "./icons/icon-512x512.png"
 ];
 
-const CACHE_NAME = "pwa-budget-cache-v2";
-const DATA_CACHE_NAME = "data-budget-cache-v2";
+const CACHE_NAME = "pwa-budget-cache";
+const DATA_CACHE_NAME = "data-budget-cache";
 
 self.addEventListener('install', function(e){
     e.waitUntil (
@@ -24,7 +24,7 @@ self.addEventListener('install', function(e){
             return cache.addAll(FILES_TO_CACHE);
         })
     );
-    self.skipWaiting();
+    self.skipWaiting
 });
 
 self.addEventListener('activate', function(e) {
